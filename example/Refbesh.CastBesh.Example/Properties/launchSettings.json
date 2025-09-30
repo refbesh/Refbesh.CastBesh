@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Refbesh.CastBesh.Example": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
