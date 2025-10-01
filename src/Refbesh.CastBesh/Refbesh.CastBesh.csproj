@@ -68,5 +68,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="All" />
 	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="**\*.cs" />
+	</ItemGroup>
 
 </Project>
