@@ -1,17 +1,22 @@
 ﻿using Refbesh.CastBesh;
 using Refbesh.CastBesh.Example.Models;
 using Refbesh.CastBesh.Casting;
+using Refbesh.CastBesh.Extensions;
 using Refbesh.CastBesh.Example;
-using Refbesh.CastBesh.Example.Models;
+using Refbesh.CastBesh.Diagnostics;
 
+Console.WriteLine("Initializing CastBesh...\n");
 Startup.ConfigureMappings();
 
-Console.WriteLine("=== Refbesh.CastBesh - Native Cast Syntax ===\n");
+Console.WriteLine("\n╔════════════════════════════════════════════════════════════════╗");
+Console.WriteLine("║    CastBesh - Native Cast Syntax via Source Generator         ║");
+Console.WriteLine("║    Just like (int)myDouble but for complex types!             ║");
+Console.WriteLine("╚════════════════════════════════════════════════════════════════╝\n");
 
-// ----------------------------------------
-// Example 1: Entity to DTO (Like primitive cast!)
-// ----------------------------------------
-Console.WriteLine("1. Entity to DTO Cast:");
+// ============================================
+// Example 1: EXPLICIT CAST SYNTAX (Main Feature!)
+// ============================================
+Console.WriteLine("═══ Example 1: Explicit Cast Syntax (Like Primitives!) ═══\n");
 
 var userEntity = new UserEntity
 {
@@ -19,172 +24,272 @@ var userEntity = new UserEntity
     FirstName = "John",
     LastName = "Doe",
     Email = "john.doe@example.com",
-    CreatedAt = DateTime.UtcNow,
-    IsActive = true
+    CreatedAt = DateTime.UtcNow.AddYears(-2),
+    IsActive = true,
+    PhoneNumber = "+1-555-0123",
+    LastLoginDate = DateTime.UtcNow.AddHours(-3)
 };
 
-// Native cast syntax - just like (int)myDouble!
-var userDto = (UserDto)userEntity;
+Console.WriteLine("Compare with primitive casting:");
+double myDouble = 10.7;
+int myInt = (int)myDouble;
+Console.WriteLine($"  Primitive: (int){myDouble} = {myInt}");
 
-Console.WriteLine($"   Original: {userEntity.FirstName} {userEntity.LastName}");
-Console.WriteLine($"   Casted DTO: {userDto.FullName} - {userDto.Email} [{userDto.Status}]\n");
+// YOUR MAIN FEATURE - Cast objects like primitives!
+var userDto = (UserDto)userEntity;  // ⭐ EXPLICIT CAST SYNTAX!
+Console.WriteLine($"  CastBesh:  (UserDto)userEntity = {userDto.FullName}\n");
 
-// ----------------------------------------
-// Example 2: DTO to Entity (Reverse cast!)
-// ----------------------------------------
-Console.WriteLine("2. DTO to Entity Cast:");
+Console.WriteLine("Result:");
+Console.WriteLine($"  Original: {userEntity.FirstName} {userEntity.LastName}");
+Console.WriteLine($"  Casted:   {userDto.FullName} ({userDto.Status})\n");
 
-var newUserDto = new UserDto
+// ============================================
+// Example 2: Reverse Casting
+// ============================================
+Console.WriteLine("═══ Example 2: Bidirectional Casting ═══\n");
+
+var newDto = new UserDto
 {
     Id = 2,
     FullName = "Jane Smith",
     Email = "jane.smith@example.com",
-    Status = "Active"
+    Status = "Active",
+    Phone = "+1-555-9876"
 };
 
-// Reverse cast - just like casting back!
-var newUserEntity = (UserEntity)newUserDto;
+Console.WriteLine($"Original DTO: {newDto.FullName}");
 
-Console.WriteLine($"   Original DTO: {newUserDto.FullName}");
-Console.WriteLine($"   Casted Entity: {newUserEntity.FirstName} {newUserEntity.LastName}");
-Console.WriteLine($"   IsActive: {newUserEntity.IsActive}\n");
+// Cast DTO back to Entity
+var newEntity = (UserEntity)newDto;  // ⭐ REVERSE CAST!
+Console.WriteLine($"Casted Entity: {newEntity.FirstName} {newEntity.LastName}");
+Console.WriteLine($"IsActive: {newEntity.IsActive}\n");
 
-// ----------------------------------------
-// Example 3: Product Casting
-// ----------------------------------------
-Console.WriteLine("3. Product Entity to DTO:");
+// ============================================
+// Example 3: Round-Trip Casting
+// ============================================
+Console.WriteLine("═══ Example 3: Round-Trip Casting ═══\n");
 
-var productEntity = new ProductEntity
+var original = new UserEntity
 {
-    Id = 100,
-    Name = "Laptop",
-    Price = 999.99m,
-    Stock = 5
+    Id = 99,
+    FirstName = "Test",
+    LastName = "User",
+    Email = "test@example.com",
+    IsActive = true
 };
 
-//  Cast product entity to DTO
-var productDto = (ProductDto)productEntity;
+// Entity -> DTO -> Entity (multiple casts)
+var intermediate = (UserDto)original;
+var roundTrip = (UserEntity)intermediate;
 
-Console.WriteLine($"   Product: {productDto.Name}");
-Console.WriteLine($"   Price: {productDto.DisplayPrice}");
-Console.WriteLine($"   In Stock: {productDto.InStock}\n");
+Console.WriteLine($"Original:   {original.FirstName} {original.LastName}");
+Console.WriteLine($"After DTO:  {intermediate.FullName}");
+Console.WriteLine($"Round-trip: {roundTrip.FirstName} {roundTrip.LastName}\n");
 
-// ----------------------------------------
-// Example 4: Chained Operations with Casts
-// ----------------------------------------
-Console.WriteLine("4. Using Casts in Methods:");
+// ============================================
+// Example 4: Multiple Target Types
+// ============================================
+Console.WriteLine("═══ Example 4: One Entity, Multiple DTOs ═══\n");
 
-ProcessUserDto((UserDto)userEntity);
-ProcessUserEntity((UserEntity)userDto);
-Console.WriteLine();
+// Cast same entity to different DTO types
+var fullDto = (UserDto)userEntity;
+var listDto = (UserListDto)userEntity;
 
-// ----------------------------------------
+Console.WriteLine($"Full DTO:  {fullDto.FullName} | {fullDto.Email}");
+Console.WriteLine($"List DTO:  {listDto.Name} | {listDto.Status}\n");
+
+// ============================================
 // Example 5: Collections with Cast Syntax
-// ----------------------------------------
-Console.WriteLine("5. Casting Collections:");
+// ============================================
+Console.WriteLine("═══ Example 5: Collections ═══\n");
 
-var userEntities = new List<UserEntity>
-        {
-            new() { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@ex.com", IsActive = true },
-            new() { Id = 2, FirstName = "Bob", LastName = "Williams", Email = "bob@ex.com", IsActive = false },
-            new() { Id = 3, FirstName = "Carol", LastName = "Brown", Email = "carol@ex.com", IsActive = true }
-        };
-
-// Cast each entity using native syntax
-var userDtos = userEntities.Select(e => (UserDto)e).ToList();
-
-foreach (var dto in userDtos)
+var users = new List<UserEntity>
 {
-    Console.WriteLine($"   - {dto.FullName}: {dto.Status}");
+    new() { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@ex.com", IsActive = true },
+    new() { Id = 2, FirstName = "Bob", LastName = "Williams", Email = "bob@ex.com", IsActive = false },
+    new() { Id = 3, FirstName = "Carol", LastName = "Brown", Email = "carol@ex.com", IsActive = true },
+    new() { Id = 4, FirstName = "David", LastName = "Miller", Email = "david@ex.com", IsActive = true }
+};
+
+// Cast each item using explicit cast syntax in LINQ
+var dtos = users.Select(e => (UserDto)e).ToList();  // ⭐ CAST IN LINQ!
+Console.WriteLine($"Casted {dtos.Count} users:");
+foreach (var dto in dtos.Take(3))
+{
+    Console.WriteLine($"  • {dto.FullName}: {dto.Status}");
 }
 Console.WriteLine();
 
-// ----------------------------------------
-// Example 6: Inline Casting in Expressions
-// ----------------------------------------
-Console.WriteLine("6. Inline Casting:");
+// Cast to different DTO type
+var listDtos = users.Select(e => (UserListDto)e).ToList();
+Console.WriteLine("As List DTOs:");
+foreach (var dto in listDtos.Take(3))
+{
+    Console.WriteLine($"  • {dto.Name} {dto.Status}");
+}
+Console.WriteLine();
+
+// ============================================
+// Example 6: Products
+// ============================================
+Console.WriteLine("═══ Example 6: Product Casting ═══\n");
+
+var product = new ProductEntity
+{
+    Id = 101,
+    Name = "Laptop",
+    Description = "High-performance laptop",
+    Price = 1299.99m,
+    Stock = 15,
+    Category = "Electronics"
+};
+
+// Cast to different DTO types
+var productDto = (ProductDto)product;  // ⭐ EXPLICIT CAST!
+var detailedDto = (ProductDetailDto)product;  // ⭐ DIFFERENT TYPE!
+
+Console.WriteLine($"Basic DTO:    {productDto.Name} - {productDto.DisplayPrice}");
+Console.WriteLine($"Detailed DTO: {detailedDto.Name} - {detailedDto.Availability}\n");
+
+// ============================================
+// Example 7: Method Parameters
+// ============================================
+Console.WriteLine("═══ Example 7: Inline Casting in Methods ═══\n");
 
 // Cast directly in method calls
-var result = CalculateUserScore((UserDto)userEntity);
-Console.WriteLine($"   User Score: {result}\n");
+ProcessUserDto((UserDto)userEntity);  // ⭐ INLINE CAST!
+ProcessUserEntity((UserEntity)userDto);  // ⭐ INLINE REVERSE!
+ProcessProductDto((ProductDto)product);  // ⭐ INLINE CAST!
+Console.WriteLine();
 
-// ----------------------------------------
-// Example 7: Conditional Casting
-// ----------------------------------------
-Console.WriteLine("7. Conditional Casting:");
+// ============================================
+// Example 8: Pattern Matching
+// ============================================
+Console.WriteLine("═══ Example 8: Pattern Matching with Casts ═══\n");
 
-var entities = new List<object> { userEntity, productEntity };
+var entities = new List<object> { userEntity, product };
 
 foreach (var entity in entities)
 {
     if (entity is UserEntity user)
     {
-        var dto = (UserDto)user;
-        Console.WriteLine($"   User: {dto.FullName}");
+        var dto = (UserDto)user;  // ⭐ CAST IN CONDITION!
+        Console.WriteLine($"  User: {dto.FullName}");
     }
-    else if (entity is ProductEntity product)
+    else if (entity is ProductEntity prod)
     {
-        var pdto = (ProductDto)product;
-        Console.WriteLine($"   Product: {pdto.Name} - {pdto.DisplayPrice}");
+        var dto = (ProductDto)prod;  // ⭐ CAST IN CONDITION!
+        Console.WriteLine($"  Product: {dto.Name} - {dto.DisplayPrice}");
     }
 }
 Console.WriteLine();
 
-// ----------------------------------------
-// Example 8: Async Operations (using CastEngine directly)
-// ----------------------------------------
-Console.WriteLine("8. Async Casting:");
+// ============================================
+// Example 9: Complex Objects
+// ============================================
+Console.WriteLine("═══ Example 9: Complex Objects ═══\n");
 
-var asyncDto = await CastEngine.CastAsync<UserEntity, UserDto>(userEntity);
-Console.WriteLine($"   Async Result: {asyncDto.FullName}\n");
-
-// ----------------------------------------
-// Example 9: Round-trip Casting
-// ----------------------------------------
-Console.WriteLine("9. Round-trip Cast:");
-
-var originalEntity = new UserEntity
+var order = new OrderEntity
 {
-    Id = 99,
-    FirstName = "Test",
-    LastName = "User",
-    Email = "testtest@example.com",
-    IsActive = true
+    Id = 1001,
+    UserId = 1,
+    OrderDate = DateTime.UtcNow,
+    TotalAmount = 1419.97m,
+    Status = "Shipped",
+    Items = new List<OrderItemEntity>
+    {
+        new() { ProductId = 101, ProductName = "Laptop", Quantity = 1, UnitPrice = 1299.99m },
+        new() { ProductId = 102, ProductName = "Mouse", Quantity = 4, UnitPrice = 29.99m }
+    }
 };
 
-// Entity -> DTO -> Entity
-var intermediateDto = (UserDto)originalEntity;
-var roundTripEntity = (UserEntity)intermediateDto;
+var orderDto = (OrderDto)order;  // ⭐ CAST COMPLEX OBJECT!
+Console.WriteLine($"Order #{orderDto.Id}");
+Console.WriteLine($"  Total: {orderDto.TotalAmount}");
+Console.WriteLine($"  Items: {orderDto.ItemCount}");
+Console.WriteLine($"  Status: {orderDto.Status}\n");
 
-Console.WriteLine($"   Original: {originalEntity.FirstName} {originalEntity.LastName}");
-Console.WriteLine($"   After round-trip: {roundTripEntity.FirstName} {roundTripEntity.LastName}\n");
+// ============================================
+// Example 10: Chained Operations
+// ============================================
+Console.WriteLine("═══ Example 10: Chained Operations ═══\n");
 
-// ----------------------------------------
-// Example 10: Mimicking Primitive Casts
-// ----------------------------------------
-Console.WriteLine("10. Compare with Primitive Casts:");
+var result = users
+    .Where(u => u.IsActive)
+    .Select(u => (UserDto)u)  // ⭐ CAST IN PIPELINE!
+    .OrderBy(d => d.FullName)
+    .Take(3)
+    .ToList();
 
-double myDouble = 10.7;
-int myInt = (int)myDouble;  // Primitive cast
-Console.WriteLine($"   Primitive: (int){myDouble} = {myInt}");
+Console.WriteLine("Active users (sorted):");
+foreach (var dto in result)
+{
+    Console.WriteLine($"  • {dto.FullName}");
+}
+Console.WriteLine();
 
-var entity1 = new UserEntity { Id = 1, FirstName = "Tom", LastName = "Ford", Email = "tom@ex.com", IsActive = true };
-var dto1 = (UserDto)entity1;  // CastBesh cast - same syntax!
-Console.WriteLine($"   CastBesh: (UserDto)entity = {dto1.FullName}");
+// ============================================
+// Example 11: Alternative Syntax Options
+// ============================================
+Console.WriteLine("═══ Example 11: Alternative Syntax ═══\n");
 
-Console.WriteLine("\n=== Examples Complete ===");
+Console.WriteLine("All these work:");
 
+// Option 1: Explicit cast (main feature)
+var dto1 = (UserDto)userEntity;
+Console.WriteLine($"  1. (UserDto)entity: {dto1.FullName}");
+
+// Option 2: .As<T>() extension
+var dto2 = userEntity.As<UserDto>();
+Console.WriteLine($"  2. .As<UserDto>():  {dto2.FullName}");
+
+// Option 3: .ToCastable().To<T>()
+var dto3 = userEntity.ToCastable().To<UserDto>();
+Console.WriteLine($"  3. .ToCastable():   {dto3.FullName}");
+
+Console.WriteLine("\nRecommended: Use (TargetType)source for best readability!\n");
+
+// ============================================
+// Example 12: Performance
+// ============================================
+Console.WriteLine("═══ Example 12: Performance ═══\n");
+
+MappingDiagnostics.Enabled = true;
+
+// Perform 10,000 casts
+for (int i = 0; i < 10000; i++)
+{
+    var _ = (UserDto)userEntity;  // ⭐ EXPLICIT CAST!
+}
+
+var metrics = MappingDiagnostics.GetMetrics<UserEntity, UserDto>();
+if (metrics != null)
+{
+    Console.WriteLine($"Performed {metrics.TotalMappings:N0} casts");
+    Console.WriteLine($"Average: {metrics.AverageDuration.TotalMilliseconds:F4} ms");
+    Console.WriteLine($"Fastest: {metrics.FastestMapping.TotalMilliseconds:F4} ms");
+    Console.WriteLine($"Success: {metrics.SuccessRate:F1}%");
+}
+
+Console.WriteLine("\n╔════════════════════════════════════════════════════════════════╗");
+Console.WriteLine("║                   Examples Complete!                           ║");
+Console.WriteLine("║                                                                ║");
+Console.WriteLine("║  Main Feature: (TargetType)source - like primitive casts!     ║");
+Console.WriteLine("║  No manual operators - Source Generator does it all!          ║");
+Console.WriteLine("╚════════════════════════════════════════════════════════════════╝\n");
+
+// Helper methods
 static void ProcessUserDto(UserDto dto)
 {
-    Console.WriteLine($"   Processing DTO: {dto.FullName}");
+    Console.WriteLine($"  → Processing DTO: {dto.FullName}");
 }
 
 static void ProcessUserEntity(UserEntity entity)
 {
-    Console.WriteLine($"   Processing Entity: {entity.FirstName} {entity.LastName}");
+    Console.WriteLine($"  → Processing Entity: {entity.FirstName} {entity.LastName}");
 }
 
-static int CalculateUserScore(UserDto dto)
+static void ProcessProductDto(ProductDto dto)
 {
-    return dto.Id * 10;
+    Console.WriteLine($"  → Processing Product: {dto.Name} ({dto.DisplayPrice})");
 }
