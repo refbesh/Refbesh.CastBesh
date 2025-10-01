@@ -1,5 +1,6 @@
 MIT License
 
+Copyright (c) [2025] [Jabbar H., Refbesh]
 Copyright (c) [2025] [refbesh]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
