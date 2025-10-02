@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<PackageId>Refbesh.CastBesh</PackageId>
+		<Version>1.0.1</Version>
+		<Authors>Jabbar Huseynzada</Authors>
+		<Company>Refbesh</Company>
+		<Product>CastBesh</Product>
+		<Description>A high-performance type-casting mapper library that enables native C# cast syntax for object mapping. Transform complex mappings into simple, intuitive type casts like (UserDto)userEntity - just like primitive type casting!</Description>
+		<Copyright>Copyright © 2025 Refbesh</Copyright>
+		<PackageTags>mapper;mapping;typecast;cast;converter;dto;automapper;performance;expression-trees</PackageTags>
+		<PackageProjectUrl>https://github.com/refbesh/Refbesh.CastBesh</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/refbesh/Refbesh.CastBesh</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReleaseNotes>v1.0.1: Updated README with improved documentation</PackageReleaseNotes>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<DefineConstants>$(DefineConstants);NET6_0_OR_GREATER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<DefineConstants>$(DefineConstants);NET7_0_OR_GREATER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>$(DefineConstants);NET8_0_OR_GREATER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+		<DefineConstants>$(DefineConstants);NET9_0_OR_GREATER</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="icon.png" Pack="true" PackagePath="\" Condition="Exists('icon.png')" />
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" Condition="Exists('LICENSE.txt')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
+</Project>
